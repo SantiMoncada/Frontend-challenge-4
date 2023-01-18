@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
+import { Header } from './Header';
+import { Input } from './Input';
+import { Messages } from './Messages';
 
-var core = new window.Landbot.Core({
+const core = new window.Landbot.Core({
   firebase: window.firebase,
   configUrl: 'https://chats.landbot.io/u/H-441480-B0Q96FP58V53BJ2J/index.json',
 });
 
-export default function Chat() {
+const Chat = () => {
   const [messages, setMessages] = useState({});
-  const [input, setInput] = useState('');
 
   useEffect(() => {
     core.pipelines.$readableSequence.subscribe((data) => {
@@ -27,81 +29,16 @@ export default function Chat() {
     scrollBottom(container);
   }, [messages]);
 
-  const submit = () => {
-    if (input !== '') {
-      core.sendMessage({ message: input });
-      setInput('');
-    }
-  };
-
   return (
     <>
-      <div className="landbot-header">
-        <h1 className="subtitle">Landbot</h1>
-      </div>
+      <Header />
 
-      <div
-        id="landbot-messages-container"
-        className="landbot-messages-container"
-      >
-        {Object.values(messages)
-          .filter(messagesFilter)
-          .sort((a, b) => a.timestamp - b.timestamp)
-          .map((message) => (
-            <article
-              key={message.key}
-              data-author={message.author}
-              className="media landbot-message"
-            >
-              <figure className="media-left landbot-message-avatar">
-                <p className="image is-64x64">
-                  <img
-                    className="is-rounded"
-                    src="http://i.pravatar.cc/100"
-                    alt=""
-                  />
-                </p>
-              </figure>
-              <div className="media-content landbot-message-content">
-                <div className="content">
-                  <p>{message.text}</p>
-                </div>
-              </div>
-            </article>
-          ))}
-      </div>
+      <Messages data={messages}></Messages>
 
-      <div className="landbot-input-container">
-        <div className="field">
-          <div className="control">
-            <input
-              className="landbot-input"
-              type="text"
-              placeholder="Type here..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyUp={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  submit();
-                }
-              }}
-            />
-            <button
-              className="button landbot-input-send"
-              onClick={submit}
-              disabled={input === ''}
-            >
-              <span className="icon is-large">
-                <i className="fas fa-paper-plane fa-lg"></i>
-              </span>
-            </button>
-          </div>
-        </div>
-      </div>
+      <Input send={(msg) => core.sendMessage(msg)} />
     </>
   );
-}
+};
 
 function parseMessages(messages) {
   return Object.values(messages).reduce((obj, next) => {
@@ -120,11 +57,6 @@ function parseMessage(data) {
   };
 }
 
-function messagesFilter(data) {
-  /** Support for basic message types */
-  return ['text', 'dialog'].includes(data.type);
-}
-
 function scrollBottom(container) {
   if (container) {
     container.scrollTo({
@@ -133,3 +65,5 @@ function scrollBottom(container) {
     });
   }
 }
+
+export default Chat;
