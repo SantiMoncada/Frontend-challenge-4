@@ -13,7 +13,9 @@ export const Messages = ({ data }) => {
         .filter(messagesFilter)
         .sort((a, b) => a.timestamp - b.timestamp)
         .map((message) => (
-          <Message author={message.author}>{message.text}</Message>
+          <Message key={message.key} author={message.author}>
+            {message.text}
+          </Message>
         ))}
     </div>
   );

@@ -31,9 +31,9 @@ const Chat = () => {
 
   return (
     <>
-      <Header />
+      <Header>Landbot</Header>
 
-      <Messages data={messages}></Messages>
+      <Messages data={messages} />
 
       <Input send={(msg) => core.sendMessage(msg)} />
     </>
